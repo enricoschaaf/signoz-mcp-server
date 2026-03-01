@@ -6,21 +6,8 @@ on:
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
-  build:
-    uses: signoz/primus.workflows/.github/workflows/go-build.yaml@main
-    secrets: inherit
-    with:
-      PRIMUS_REF: main
-      GO_BUILD_CONTEXT: ./cmd/server
-      GO_VERSION: 1.25
-      GO_BUILD_FLAGS: ""
-      DOCKER_BASE_IMAGES: '{"distroless":"gcr.io/distroless/base:latest"}'
-      DOCKER_DOCKERFILE_PATH: Dockerfile.multi-arch
-      DOCKER_MANIFEST: true
-      DOCKER_PROVIDERS: dockerhub
   binary:
     runs-on: ubuntu-latest
     steps:
@@ -31,14 +18,12 @@ jobs:
       - name: go-install
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ inputs.GO_VERSION }}
+          go-version: "1.25"
       - name: run-goreleaser
         uses: goreleaser/goreleaser-action@v6
         with:
-          distribution: goreleaser-pro
+          distribution: goreleaser
           version: '~> v2'
           args: release --clean
-          workdir: ${{ matrix.workdirs }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
